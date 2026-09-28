@@ -1,0 +1,13 @@
+# Keep web assets LF in the repo so diffs stay clean across machines.
+*.html text eol=lf
+*.svg  text eol=lf
+*.md   text eol=lf
+*.json text eol=lf
+*.jsonc text eol=lf
+
+# Never touch binaries.
+*.jpg binary
+*.png binary
+*.mp4 binary
+*.ttf binary
+*.otf binary
