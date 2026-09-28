@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>backyard rail - sign up</title>
+<style>
+  @font-face { font-family: 'HK'; src: url('fonts/hellskittchen.ttf') format('truetype'); }
+  @font-face { font-family: 'HKB'; src: url('fonts/hellskittchen-bold.otf') format('opentype'); font-weight: bold; }
+  @font-face { font-family: 'Hand'; src: url('fonts/handodle.ttf') format('truetype'); }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #131110;
+    color: #f0e8d8;
+    font-family: 'Courier New', Courier, monospace;
+    min-height: 100vh;
+    padding: 2rem 1.2rem;
+  }
+
+  h1 {
+    font-family: 'HKB', 'HK', Impact, sans-serif;
+    font-size: 2.2rem;
+    text-transform: uppercase;
+    color: #f0e8d8;
+    text-shadow: 3px 3px 0 #bf4a24;
+    margin-bottom: 0.2rem;
+  }
+
+  .sub {
+    font-family: 'Hand', cursive;
+    font-size: 0.85rem;
+    color: #7a6844;
+    margin-bottom: 2rem;
+  }
+
+  form { max-width: 400px; }
+
+  label {
+    display: block;
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #7a6844;
+    margin-bottom: 0.3rem;
+    margin-top: 1rem;
+  }
+
+  input {
+    width: 100%;
+    background: #1e1b18;
+    border: 1px solid #7a6844;
+    color: #f0e8d8;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+    padding: 0.7rem;
+    outline: none;
+    -webkit-appearance: none;
+    border-radius: 0;
+  }
+
+  input:focus { border-color: #bf4a24; }
+  input::placeholder { color: #4a3f30; }
+
+  button {
+    margin-top: 1.2rem;
+    width: 100%;
+    background: #bf4a24;
+    color: #f0e8d8;
+    border: none;
+    font-family: 'HKB', 'HK', Impact, sans-serif;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.8rem;
+    cursor: pointer;
+  }
+
+  button:active { opacity: 0.8; }
+  button:disabled { background: #4a3f30; cursor: wait; }
+
+  .sep {
+    height: 1px;
+    background: #2a2622;
+    margin: 1.5rem 0;
+    max-width: 400px;
+  }
+
+  .ig {
+    display: block;
+    max-width: 400px;
+    text-align: center;
+    padding: 0.7rem;
+    border: 1px solid #7a6844;
+    color: #f0e8d8;
+    text-decoration: none;
+    font-family: 'HK', Impact, sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .ig:active { border-color: #bf4a24; color: #bf4a24; }
+
+  .ig-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #7a6844;
+    margin-bottom: 0.5rem;
+  }
+
+  .choco {
+    margin-top: 1.2rem;
+    font-family: 'Hand', cursive;
+    font-size: 0.8rem;
+    color: #d4a843;
+    border: 1px dashed #d4a843;
+    padding: 0.5rem 0.8rem;
+    max-width: 400px;
+    text-align: center;
+  }
+
+  .done { display: none; }
+
+  .done h2 {
+    font-family: 'HKB', 'HK', Impact, sans-serif;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+
+  .done p {
+    font-family: 'Hand', cursive;
+    font-size: 0.85rem;
+    color: #7a6844;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .done .ig-followed {
+    font-size: 0.55rem;
+    color: #7a6844;
+    letter-spacing: 0.1em;
+    margin-top: 0.8rem;
+    opacity: 0.5;
+  }
+
+  .err { border-color: #bf4a24 !important; }
+</style>
+</head>
+<body>
+
+<h1>backyard rail</h1>
+<p class="sub">get on the list</p>
+
+<div id="formWrap">
+  <form id="f" onsubmit="return go(event)">
+    <label for="n">name</label>
+    <input type="text" id="n" placeholder="your name" required autocomplete="name">
+
+    <label for="e">email</label>
+    <input type="email" id="e" placeholder="you@email.com" required autocomplete="email">
+
+    <label for="p">phone</label>
+    <input type="tel" id="p" placeholder="xxx-xxx-xxxx" autocomplete="tel">
+
+    <button type="submit" id="btn">sign me up</button>
+  </form>
+
+  <div class="sep"></div>
+
+  <p class="ig-label">follow us</p>
+  <a href="https://instagram.com/backyardrail" target="_blank" class="ig" id="igBtn" onclick="trackIG()">@backyardrail</a>
+
+  <div class="choco">show this at the booth for a free chocolate bar</div>
+</div>
+
+<div class="done" id="done">
+  <h2>you're in</h2>
+  <p>we'll hit you up for the next jam.<br>show this screen for your chocolate bar.</p>
+  <div class="sep"></div>
+  <p class="ig-label">follow us</p>
+  <a href="https://instagram.com/backyardrail" target="_blank" class="ig" id="igBtn2" onclick="trackIG()">follow @backyardrail</a>
+  <p class="done .ig-followed" id="igNote" style="display:none;font-size:0.5rem;color:#7a6844;margin-top:0.5rem;opacity:0.5;">clicked</p>
+</div>
+
+<!-- hidden iframe for form submission (bypasses CORS) -->
+<iframe name="gsframe" style="display:none;"></iframe>
+
+<script>
+var EP = 'https://script.google.com/macros/s/REDACTED/exec';
+
+// Detect source from URL param: ?src=booth-qr or default to "site"
+var params = new URLSearchParams(window.location.search);
+var SOURCE = params.get('src') || 'site';
+
+// Track if user clicked Instagram
+var clickedIG = false;
+
+function trackIG() {
+  clickedIG = true;
+  // Update the stored entry if it exists
+  var a = JSON.parse(localStorage.getItem('signups') || '[]');
+  if (a.length > 0) {
+    a[a.length - 1].instagram = 'yes';
+    localStorage.setItem('signups', JSON.stringify(a));
+  }
+  // Also send an update to sheets
+  sendToSheets({
+    name: '(ig-click-update)',
+    email: document.getElementById('e') ? document.getElementById('e').value.trim() : '',
+    phone: '',
+    source: SOURCE,
+    instagram: 'yes',
+    timestamp: new Date().toISOString()
+  });
+  var note = document.getElementById('igNote');
+  if (note) note.style.display = 'block';
+}
+
+function save(d) {
+  var a = JSON.parse(localStorage.getItem('signups') || '[]');
+  a.push(d);
+  localStorage.setItem('signups', JSON.stringify(a));
+}
+
+function sendToSheets(data) {
+  var form = document.createElement('form');
+  form.method = 'POST';
+  form.action = EP;
+  form.target = 'gsframe';
+  for (var key in data) {
+    var input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = key;
+    input.value = data[key];
+    form.appendChild(input);
+  }
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
+}
+
+function go(e) {
+  e.preventDefault();
+  var n = document.getElementById('n').value.trim();
+  var em = document.getElementById('e').value.trim();
+  var p = document.getElementById('p').value.trim();
+
+  document.querySelectorAll('input').forEach(function(i) { i.classList.remove('err'); });
+  if (!n) { document.getElementById('n').classList.add('err'); return false; }
+  if (!em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { document.getElementById('e').classList.add('err'); return false; }
+
+  var btn = document.getElementById('btn');
+  btn.disabled = true;
+  btn.textContent = 'one sec...';
+
+  var data = {
+    name: n,
+    email: em,
+    phone: p,
+    source: SOURCE,
+    instagram: clickedIG ? 'yes' : 'no',
+    visitor_id: localStorage.getItem('hesh_vid') || '',
+    timestamp: new Date().toISOString()
+  };
+
+  save(data);
+  try { sendToSheets(data); } catch(x) {}
+
+  setTimeout(function() {
+    document.getElementById('formWrap').style.display = 'none';
+    document.getElementById('done').style.display = 'block';
+  }, 500);
+
+  return false;
+}
+
+// console helper
+window.exportCSV = function() {
+  var a = JSON.parse(localStorage.getItem('signups') || '[]');
+  if (!a.length) return alert('no signups yet');
+  var csv = 'Name,Email,Phone,Source,Instagram,Timestamp\n' + a.map(function(r) { return '"'+r.name+'","'+r.email+'","'+r.phone+'","'+r.source+'","'+(r.instagram||'no')+'","'+r.t+'"'; }).join('\n');
+  var b = new Blob([csv], {type:'text/csv'});
+  var l = document.createElement('a');
+  l.href = URL.createObjectURL(b); l.download = 'signups.csv'; l.click();
+};
+</script>
+
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"e86e2259f3ff45b9bf551050fc6f536a","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
