@@ -17,7 +17,7 @@ public/
   index.html      the whole site, inline CSS + JS
   signup.html     signup page
   img/            photos by era (roots, build, jam1, jam2, allseason, redbull)
-  fonts/          Algeon, Grey Red, Handodle, Hells Kitchen
+  fonts/          Hubot Sans, Michroma (both OFL, licences alongside)
   *.mp4           the two video clips
 wrangler.jsonc    Cloudflare Worker (static assets) config
 ```
