@@ -117,7 +117,7 @@
   /* ===== HERO ===== */
   #hero {
     width: 100%; aspect-ratio: 2.39 / 1; min-height: 420px; max-height: calc(100vh - 56px); max-width: 100%;
-    --pos: 30% 58%; --bloom: .5;
+    --pos: 50% 24%; --bloom: .5;
     --shade: linear-gradient(0deg, rgba(5, 6, 8, .62), transparent 50%, transparent 80%, rgba(5, 6, 8, .4));
   }
   /* parallax: the photo drifts a touch slower than the page (the scale leaves room for the drift) */
@@ -134,27 +134,39 @@
     font-size: clamp(2.6rem, 10.5vw, 10rem);
     text-shadow: 0 0 22px rgba(255, 217, 163, .4), 0 0 60px rgba(255, 107, 31, .25);
   }
-  @media (max-width: 700px) { #hero { aspect-ratio: 4 / 5; max-height: none; --pos: 24% 50%; } .hud { padding: 24px; } }
+  @media (max-width: 700px) { #hero { aspect-ratio: 4 / 5; max-height: none; --pos: 47% 50%; } .hud { padding: 24px; } }
 
-  /* ===== SNOW GUN (a fan gun, drawn inline so it can use the page's type and colours) ===== */
+  /* ===== SNOW GUN: a screen-printed TF10 sticker slapped onto the edge of the screen ===== */
   #snowmaker {
-    --w: 440px;
-    position: fixed; left: calc(-1 * var(--w) - 40px); top: 12%; z-index: 9997; width: var(--w);
-    transition: left 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
-    pointer-events: none;
+    --w: 290px;
+    position: fixed; left: 0; top: 4vh; z-index: 9997; width: var(--w); pointer-events: none;
+    transform: translateX(calc(-100% - 60px)) rotate(-16deg);
+    transition: transform .42s cubic-bezier(.2, .9, .25, 1);
   }
-  #snowmaker.active { left: -40px; }
-  #snowmaker svg { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 12px 18px rgba(17, 19, 22, .35)); }
-  .sg-fan { transform-box: fill-box; transform-origin: center; }
-  #snowmaker.active .sg-fan { animation: sg-spin .35s linear infinite; }
-  .sg-beacon { opacity: 0; }
-  #snowmaker.active .sg-beacon { animation: sg-blink 1s steps(1) infinite; }
-  .sg-label { font-family: var(--sans); font-stretch: 125%; font-weight: 200; letter-spacing: -.02em; }
-  .sg-label tspan { font-weight: 800; }
-  @keyframes sg-spin { to { transform: rotate(360deg); } }
-  @keyframes sg-blink { 50% { opacity: 1; } }
-  @media (max-width: 600px) { #snowmaker { --w: 300px; } }
-  #snowCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9996; }
+  #snowmaker.active { transform: translateX(16px) rotate(-5deg); }
+  #snowmaker img { display: block; width: 100%; height: auto; filter: drop-shadow(3px 8px 10px rgba(17, 19, 22, .45)); }
+  @media (max-width: 600px) { #snowmaker { --w: 190px; top: 7vh; } }
+  #snowCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9998; }
+
+  /* frost: creeps in from the corners once the gun has been running a while, thaws when it stops */
+  @property --frost { syntax: '<length>'; inherits: true; initial-value: 0px; }
+  #frost {
+    position: fixed; inset: 0; pointer-events: none; z-index: 9995; opacity: 0; --frost: 0px;
+    transition: opacity 3.5s ease, --frost 4s ease;
+    -webkit-mask-image:
+      radial-gradient(circle at 0 0, #000, rgba(0, 0, 0, .5) calc(var(--frost) * .5), transparent var(--frost)),
+      radial-gradient(circle at 100% 0, #000, rgba(0, 0, 0, .5) calc(var(--frost) * .5), transparent var(--frost)),
+      radial-gradient(circle at 0 100%, #000, rgba(0, 0, 0, .5) calc(var(--frost) * .5), transparent var(--frost)),
+      radial-gradient(circle at 100% 100%, #000, rgba(0, 0, 0, .5) calc(var(--frost) * .5), transparent var(--frost));
+    mask-image:
+      radial-gradient(circle at 0 0, #000, rgba(0, 0, 0, .5) calc(var(--frost) * .5), transparent var(--frost)),
+      radial-gradient(circle at 100% 0, #000, rgba(0, 0, 0, .5) calc(var(--frost) * .5), transparent var(--frost)),
+      radial-gradient(circle at 0 100%, #000, rgba(0, 0, 0, .5) calc(var(--frost) * .5), transparent var(--frost)),
+      radial-gradient(circle at 100% 100%, #000, rgba(0, 0, 0, .5) calc(var(--frost) * .5), transparent var(--frost));
+  }
+  #frost.on { opacity: 1; --frost: 32vmin; transition: opacity 2.5s ease, --frost 7s cubic-bezier(.2, .6, .2, 1); }
+  #frost .glass { position: absolute; inset: 0; -webkit-backdrop-filter: blur(1.5px) brightness(1.05) saturate(.85); backdrop-filter: blur(1.5px) brightness(1.05) saturate(.85); }
+  #frost canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 
   /* ===== TICKER ===== */
   .ticker { overflow: hidden; white-space: nowrap; background: var(--ramp); border-block: 1px solid var(--ink); padding: 10px 0; }
@@ -177,7 +189,7 @@
   .specs { list-style: none; display: grid; gap: 10px; max-width: 46ch; }
   .specs li { display: flex; gap: 12px; font-size: 15px; line-height: 1.45; }
   .specs li::before { content: ""; flex: 0 0 9px; height: 9px; margin-top: 6px; background: var(--ramp); }
-  .info-shot { clip-path: polygon(16% 0, 100% 0, 100% 100%, 0 100%); --pos: 42% 50%; --bloom: .45; }
+  .info-shot { clip-path: polygon(16% 0, 100% 0, 100% 100%, 0 100%); --pos: 56% 50%; --bloom: .45; }
   .info-shot .tag {
     position: absolute; z-index: 2; right: 24px; top: 24px; writing-mode: vertical-rl;
     font-size: 2.1rem; font-stretch: 112%; color: var(--snow); background: var(--ink); padding: 14px 9px;
@@ -309,104 +321,13 @@
 </div>
 
 <!-- SNOWMAKER -->
-<div id="snowmaker" aria-hidden="true">
-  <svg viewBox="0 0 440 360" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="sg-body" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#ffffff"/>
-        <stop offset=".2" stop-color="#f3f5f7"/>
-        <stop offset=".55" stop-color="#d5dbe0"/>
-        <stop offset=".82" stop-color="#a9b1b9"/>
-        <stop offset="1" stop-color="#8a929b"/>
-      </linearGradient>
-      <linearGradient id="sg-band" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#ffa66b"/>
-        <stop offset=".45" stop-color="#ff6b1f"/>
-        <stop offset="1" stop-color="#b9480c"/>
-      </linearGradient>
-      <linearGradient id="sg-pole" gradientUnits="userSpaceOnUse" x1="225.9" y1="190.1" x2="238.1" y2="205.9">
-        <stop offset="0" stop-color="#e8ecef"/>
-        <stop offset=".4" stop-color="#ffffff"/>
-        <stop offset=".75" stop-color="#b4bcc4"/>
-        <stop offset="1" stop-color="#868e97"/>
-      </linearGradient>
-      <radialGradient id="sg-glow">
-        <stop offset="0" stop-color="#ffd27a" stop-opacity=".95"/>
-        <stop offset=".35" stop-color="#ff9a3c" stop-opacity=".55"/>
-        <stop offset="1" stop-color="#ff6b1f" stop-opacity="0"/>
-      </radialGradient>
-      <clipPath id="sg-mouth"><ellipse cx="151" cy="0" rx="13" ry="45"/></clipPath>
-      <path id="sg-blade" d="M0 0 C6 -10 22 -34 40 -20 C34 -8 18 2 0 0 Z"/>
-    </defs>
-
-    <!-- water + air line -->
-    <path d="M-6 300 C60 296 150 268 210 226" fill="none" stroke="#111316" stroke-width="16" stroke-linecap="round"/>
-    <path d="M-6 300 C60 296 150 268 210 226" fill="none" stroke="#ff6b1f" stroke-width="11" stroke-linecap="round"/>
-    <path d="M-6 297 C60 293 150 265 208 223" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity=".4"/>
-
-    <!-- tower -->
-    <polygon points="33.9,337.1 225.9,190.1 238.1,205.9 46.1,352.9" fill="url(#sg-pole)" stroke="#111316" stroke-width="2" stroke-linejoin="round"/>
-    <rect x="-6" y="-15" width="12" height="30" rx="2" fill="#2a2e35" stroke="#111316" stroke-width="1.5" transform="translate(107 293) rotate(-37.4)"/>
-    <rect x="-6" y="-15" width="12" height="30" rx="2" fill="#2a2e35" stroke="#111316" stroke-width="1.5" transform="translate(165 248) rotate(-37.4)"/>
-
-    <!-- turret -->
-    <polygon points="206,184 216,174 276,174 266,184" fill="#ff9455" stroke="#111316" stroke-width="2" stroke-linejoin="round"/>
-    <polygon points="266,184 276,174 276,224 266,234" fill="#c9560f" stroke="#111316" stroke-width="2" stroke-linejoin="round"/>
-    <rect x="206" y="184" width="60" height="50" fill="#ff6b1f" stroke="#111316" stroke-width="2" stroke-linejoin="round"/>
-    <rect x="212" y="190" width="48" height="16" fill="#ffffff" stroke="#111316" stroke-width="1.2"/>
-    <text class="sg-label" x="215" y="201.6" font-size="7" fill="#111316">backyard<tspan>rail</tspan></text>
-    <path d="M213 216 H238 M213 221 H238 M213 226 H238" stroke="#111316" stroke-width="2" stroke-linecap="round"/>
-    <circle cx="254" cy="221" r="3.2" fill="#3fc59d" stroke="#111316" stroke-width="1"/>
-    <circle class="sg-beacon" cx="250" cy="164" r="16" fill="url(#sg-glow)"/>
-    <rect x="245" y="166" width="10" height="9" fill="#2a2e35" stroke="#111316" stroke-width="1.2"/>
-    <path d="M245 166 A5 6 0 0 1 255 166 Z" fill="#ffb347" stroke="#111316" stroke-width="1.2"/>
-
-    <!-- barrel -->
-    <g transform="translate(256 112) rotate(-12)">
-      <path d="M-110 -58 L150 -58 A18 58 0 0 1 150 58 L-110 58 A18 58 0 0 1 -110 -58 Z" fill="url(#sg-body)" stroke="#111316" stroke-width="2"/>
-      <path d="M70 -58 A18 58 0 0 1 70 58 L100 58 A18 58 0 0 0 100 -58 Z" fill="url(#sg-band)"/>
-      <path d="M-100 -58 A18 58 0 0 1 -100 58 L-92 58 A18 58 0 0 0 -92 -58 Z" fill="url(#sg-band)"/>
-      <path d="M70 -58 A18 58 0 0 1 70 58 M100 -58 A18 58 0 0 1 100 58 M-100 -58 A18 58 0 0 1 -100 58 M-92 -58 A18 58 0 0 1 -92 58" fill="none" stroke="#111316" stroke-width="1.5"/>
-      <path d="M114 -58 A18 58 0 0 1 114 58 M130 -58 A18 58 0 0 1 130 58" fill="none" stroke="#111316" stroke-width="1.2" opacity=".35"/>
-      <path d="M-104 -46 H140" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity=".9"/>
-      <path d="M-104 42 H140" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity=".25"/>
-      <text class="sg-label" x="-66" y="8" font-size="21" fill="#111316">backyard<tspan>rail</tspan></text>
-      <ellipse cx="150" cy="0" rx="18" ry="58" fill="#2a2e35" stroke="#111316" stroke-width="2"/>
-      <ellipse cx="151" cy="0" rx="13" ry="45" fill="#0b0c0f"/>
-      <g clip-path="url(#sg-mouth)">
-        <g transform="translate(151 0) scale(.29 1)">
-          <g class="sg-fan">
-            <circle r="44" fill="none"/>
-            <use href="#sg-blade" fill="#8e96a0"/>
-            <use href="#sg-blade" fill="#8e96a0" transform="rotate(72)"/>
-            <use href="#sg-blade" fill="#8e96a0" transform="rotate(144)"/>
-            <use href="#sg-blade" fill="#8e96a0" transform="rotate(216)"/>
-            <use href="#sg-blade" fill="#8e96a0" transform="rotate(288)"/>
-            <circle r="8" fill="#ff6b1f" stroke="#111316" stroke-width="2"/>
-          </g>
-        </g>
-      </g>
-      <g stroke="#111316" stroke-width="1.2">
-        <circle cx="168" cy="0" r="3.4" fill="#ff6b1f"/><circle cx="165.6" cy="29" r="3.4" fill="#ffffff"/>
-        <circle cx="159" cy="50.2" r="3.4" fill="#ff6b1f"/><circle cx="150" cy="58" r="3.4" fill="#ffffff"/>
-        <circle cx="141" cy="50.2" r="3.4" fill="#ff6b1f"/><circle cx="134.4" cy="29" r="3.4" fill="#ffffff"/>
-        <circle cx="132" cy="0" r="3.4" fill="#ff6b1f"/><circle cx="134.4" cy="-29" r="3.4" fill="#ffffff"/>
-        <circle cx="141" cy="-50.2" r="3.4" fill="#ff6b1f"/><circle cx="150" cy="-58" r="3.4" fill="#ffffff"/>
-        <circle cx="159" cy="-50.2" r="3.4" fill="#ff6b1f"/><circle cx="165.6" cy="-29" r="3.4" fill="#ffffff"/>
-      </g>
-    </g>
-
-    <!-- yoke + axle -->
-    <polygon points="232,182 262,182 288,136 266,124" fill="#2a2e35" stroke="#111316" stroke-width="2" stroke-linejoin="round"/>
-    <circle cx="276" cy="129" r="7.5" fill="#eef1f3" stroke="#111316" stroke-width="2"/>
-    <circle cx="276" cy="129" r="2.5" fill="#111316"/>
-  </svg>
-</div>
+<div id="snowmaker" aria-hidden="true"><img src="img/snowgun.webp" alt="" width="828" height="1208" decoding="async" fetchpriority="low"></div>
+<div id="frost" aria-hidden="true"><div class="glass"></div><canvas id="frostCanvas"></canvas></div>
 <canvas id="snowCanvas"></canvas>
 
 <!-- ===================== HERO ===================== -->
 <section id="hero" class="shot">
-  <img src="img/redbull/DSC_5346.jpg" alt="Sliding the rail at Red Bull Snow Day" fetchpriority="high">
+  <img src="img/redbull/hero-slide.jpg" alt="Sliding the rail at Red Bull Snow Day" fetchpriority="high">
   <span class="ticks" aria-hidden="true"></span>
   <div class="hud">
     <div class="hud-row hud-top caps"><span>42.98N 81.25W</span></div>
@@ -431,7 +352,7 @@
     </ul>
   </div>
   <figure class="shot info-shot">
-    <img src="img/redbull/DSC_5463.jpg" alt="Sliding the rail beside the house" loading="lazy">
+    <img src="img/redbull/snowboard-slide.jpg" alt="Snowboarding the rail beside the house" loading="lazy">
     <span class="mark tag">snow<b>day</b></span>
   </figure>
 </section>
@@ -551,6 +472,8 @@
   <div class="strip">
     <figure class="shot card poster"><img src="img/posters/redbull-poster.jpg" alt="Red Bull poster" loading="lazy"></figure>
     <figure class="shot card"><img src="img/redbull/DSC_5346.jpg" alt="Rail action" loading="lazy"></figure>
+    <figure class="shot card"><img src="img/redbull/green-shirt-slide.jpg" alt="Sliding past the M sign" loading="lazy"></figure>
+    <figure class="shot card"><img src="img/redbull/rail-watch.jpg" alt="Watching from the side of the rail" loading="lazy"></figure>
     <figure class="shot card"><img src="img/redbull/crew-redbull.jpg" alt="Crew with Red Bull banner" loading="lazy"></figure>
     <figure class="shot card poster"><img src="img/posters/snowday-poster.jpg" alt="Snow Day poster" loading="lazy"></figure>
     <figure class="shot card"><img src="img/redbull/DSC_5467.jpg" alt="Rail slide" loading="lazy"></figure>
@@ -759,140 +682,219 @@ lbInit();
 let c=847;
 setInterval(()=>{ if(Math.random()>0.65){c+=Math.floor(Math.random()*3)+1; document.getElementById('vc').textContent=String(c).padStart(6,'0');} },3500);
 
-// SNOWMAKER EFFECT
+// SNOWMAKER EFFECT: hover the wordmark and a TF10 sticker slaps on, throws a grainy plume, and frost creeps in at the corners
 (function(){
   const canvas = document.getElementById('snowCanvas');
   const ctx = canvas.getContext('2d');
   const maker = document.getElementById('snowmaker');
+  const frost = document.getElementById('frost');
+  const frostCanvas = document.getElementById('frostCanvas');
   const heroTitle = document.getElementById('heroTitle');
-  let particles = [];
-  let snowActive = false;
-  let settled = []; // snow that has "landed"
-  let animId = null;
-  let fadeTimer = null;
+  // the mouth on the sticker (img/snowgun.webp) as fractions of the image, and the way it faces in degrees
+  const MOUTH = { x: 0.80, y: 0.233, rx: 0.10, ry: 0.11, angle: -14 };
+  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+  let W = 0, H = 0;
+  let puffs = [], grit = [], streaks = [], settled = [];
+  let snowActive = false, spraying = false, thawing = false;
+  let animId = null, sprayTimer = null, fadeTimer = null, frostTimer = null, frostSize = '';
 
-  function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  function resize(){
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = W * DPR; canvas.height = H * DPR;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
   resize();
   window.addEventListener('resize', resize);
 
-  // one soft flake, drawn once and stamped: white core, faint grey rim so it reads over snow and the light page
-  const flake = document.createElement('canvas');
-  flake.width = flake.height = 32;
-  (function(){
-    const f = flake.getContext('2d');
-    const g = f.createRadialGradient(16, 16, 0, 16, 16, 16);
-    g.addColorStop(0, 'rgba(255,255,255,1)');
-    g.addColorStop(0.62, 'rgba(255,255,255,0.95)');
-    g.addColorStop(0.8, 'rgba(120,130,140,0.35)');
-    g.addColorStop(1, 'rgba(17,19,22,0)');
-    f.fillStyle = g;
-    f.fillRect(0, 0, 32, 32);
-  })();
-  function stamp(x, y, r, a){
-    ctx.globalAlpha = Math.max(0, Math.min(1, a));
-    ctx.drawImage(flake, x - r * 1.6, y - r * 1.6, r * 3.2, r * 3.2);
-  }
+  function gauss(){ return (Math.random() + Math.random() + Math.random() - 1.5) / 0.75; }
 
-  // Nozzle: the fan gun's mouth, as fractions of the drawing (viewBox 440 x 360)
-  function nozzleTip(){
-    const r = maker.getBoundingClientRect();
-    return { x: r.left + r.width * 0.92, y: r.top + r.height * 0.223, h: r.height * 0.2 };
-  }
-
-  function spawnParticles(){
-    const tip = nozzleTip();
-    for(let i = 0; i < 12; i++){
-      const angle = -12 + (Math.random() * 28 - 14); // the barrel is tilted 12 degrees up
-      const rad = angle * Math.PI / 180;
-      const speed = 4 + Math.random() * 7;
-      const mist = Math.random() < 0.45;
-      particles.push({
-        x: tip.x + Math.random()*8,
-        y: tip.y + (Math.random() - 0.5) * tip.h,
-        vx: Math.cos(rad) * speed,
-        vy: Math.sin(rad) * speed + (Math.random() - 0.5) * 1.5,
-        r: mist ? 0.8 + Math.random() * 1.2 : 1.6 + Math.random() * 3,
-        opacity: mist ? 0.5 + Math.random() * 0.3 : 0.75 + Math.random() * 0.25,
-        gravity: mist ? 0.015 + Math.random() * 0.02 : 0.03 + Math.random() * 0.04,
-        drift: (Math.random() - 0.5) * 0.25,
-        life: 1
-      });
+  // puff sprites: a few hundred specks in a soft round falloff, like a photocopied airbrush
+  const puffSprites = [0, 1, 2].map(() => {
+    const c = document.createElement('canvas');
+    c.width = c.height = 96;
+    const g = c.getContext('2d');
+    const core = g.createRadialGradient(48, 48, 0, 48, 48, 48);
+    core.addColorStop(0, 'rgba(255,255,255,0.3)');
+    core.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = core;
+    g.fillRect(0, 0, 96, 96);
+    for(let i = 0; i < 700; i++){
+      const r = Math.abs(gauss()) * 16, a = Math.random() * Math.PI * 2;
+      g.fillStyle = `rgba(255,255,255,${(0.35 + Math.random() * 0.65).toFixed(2)})`;
+      const s = Math.random() < 0.85 ? 1 : 2;
+      g.fillRect(48 + Math.cos(a) * r, 48 + Math.sin(a) * r, s, s);
     }
+    return c;
+  });
+
+  // where the mouth is on screen right now, read off the sticker's live transform (so it's right mid-slide too)
+  function mouth(){
+    const cs = getComputedStyle(maker);
+    const m = new DOMMatrix(cs.transform);
+    const w = maker.offsetWidth, h = maker.offsetHeight, ox = w / 2, oy = h / 2;
+    const p = m.transformPoint(new DOMPoint(MOUTH.x * w - ox, MOUTH.y * h - oy));
+    const rot = Math.atan2(m.b, m.a);
+    return { x: parseFloat(cs.left) + ox + p.x, y: parseFloat(cs.top) + oy + p.y, rx: MOUTH.rx * w, ry: MOUTH.ry * h, rot, dir: MOUTH.angle * Math.PI / 180 + rot };
   }
 
-  function addSettled(x, y, r){
-    settled.push({ x, y, r: r * 0.8, opacity: 0.7 + Math.random()*0.3 });
-    if(settled.length > 600) settled.shift();
-  }
-
-  function animate(){
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw settled snow
-    for(let s of settled) stamp(s.x, s.y, s.r, s.opacity);
-
-    // Update and draw particles
-    for(let i = particles.length - 1; i >= 0; i--){
-      const p = particles[i];
-      p.vy += p.gravity;
-      p.vx += p.drift;
-      p.vx *= 0.995;
-      p.x += p.vx;
-      p.y += p.vy;
-      p.life -= 0.003;
-
-      // Settle on bottom or if slow enough
-      if(p.y > canvas.height - 5 || (p.vy > 0 && p.vy < 0.5 && p.y > canvas.height * 0.6)){
-        addSettled(p.x, Math.min(p.y, canvas.height - p.r), p.r);
-        particles.splice(i, 1);
-        continue;
-      }
-      // Remove if off screen or dead
-      if(p.x > canvas.width + 20 || p.x < -20 || p.life <= 0){
-        particles.splice(i, 1);
-        continue;
-      }
-
-      stamp(p.x, p.y, p.r, p.opacity * p.life);
+  function emit(){
+    const M = mouth();
+    const spot = () => {
+      const a = Math.random() * Math.PI * 2, u = Math.sqrt(Math.random());
+      const lx = Math.cos(a) * M.rx * u, ly = Math.sin(a) * M.ry * u;
+      return { x: M.x + lx * Math.cos(M.rot) - ly * Math.sin(M.rot), y: M.y + lx * Math.sin(M.rot) + ly * Math.cos(M.rot) };
+    };
+    // the plume
+    for(let i = 0; i < 3; i++){
+      const p = spot(), a = M.dir + (Math.random() - 0.5) * 0.45, v = 3 + Math.random() * 4;
+      puffs.push({ x: p.x, y: p.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: 8 + Math.random() * 8, grow: 0.55 + Math.random() * 0.5,
+                   peak: 0.16 + Math.random() * 0.14, life: 0, max: 110 + Math.random() * 70, s: puffSprites[i] });
     }
+    // grit: the snow itself
+    for(let i = 0; i < 8; i++){
+      const p = spot(), a = M.dir + (Math.random() - 0.5) * 0.6, v = 5 + Math.random() * 7;
+      grit.push({ x: p.x, y: p.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, s: Math.random() < 0.7 ? 1.2 : 1.2 + Math.random() * 1.8,
+                  g: 0.04 + Math.random() * 0.05, ph: Math.random() * 6.28, f: 0.05 + Math.random() * 0.08, a: 0.7 + Math.random() * 0.3 });
+    }
+    // fast droplets right out of the mouth
+    for(let i = 0; i < 2; i++){
+      const p = spot(), a = M.dir + (Math.random() - 0.5) * 0.35, v = 9 + Math.random() * 6;
+      streaks.push({ x: p.x, y: p.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0, max: 18 + Math.random() * 14 });
+    }
+    if(puffs.length > 420) puffs.splice(0, puffs.length - 420);
+    if(grit.length > 1400) grit.splice(0, grit.length - 1400);
+  }
+
+  // a speck of grit, with a faint offset print shadow so it still reads on the light page
+  function speck(x, y, s, a){
+    ctx.globalAlpha = a * 0.35;
+    ctx.fillStyle = '#111316';
+    ctx.fillRect(x + 1, y + 1, s, s);
+    ctx.globalAlpha = a;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(x, y, s, s);
+  }
+
+  function frame(){
+    ctx.clearRect(0, 0, W, H);
+    if(spraying) emit();
+
+    for(let i = puffs.length - 1; i >= 0; i--){
+      const p = puffs[i];
+      p.life++;
+      p.vx = p.vx * 0.975 + 0.015;          // drag, and a light wind to the right
+      p.vy = p.vy * 0.975 + 0.012;          // the cloud slowly sinks
+      p.x += p.vx; p.y += p.vy; p.r += p.grow;
+      const t = p.life / p.max;
+      if(t >= 1){ puffs.splice(i, 1); continue; }
+      ctx.globalAlpha = p.peak * (t < 0.15 ? t / 0.15 : 1 - (t - 0.15) / 0.85);
+      ctx.drawImage(p.s, p.x - p.r, p.y - p.r, p.r * 2, p.r * 2);
+    }
+
+    ctx.lineWidth = 1;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#ffffff';
+    for(let i = streaks.length - 1; i >= 0; i--){
+      const s = streaks[i];
+      s.life++; s.vy += 0.05; s.x += s.vx; s.y += s.vy;
+      const t = s.life / s.max;
+      if(t >= 1){ streaks.splice(i, 1); continue; }
+      ctx.globalAlpha = 0.55 * (1 - t);
+      ctx.beginPath();
+      ctx.moveTo(s.x, s.y);
+      ctx.lineTo(s.x - s.vx * 2.4, s.y - s.vy * 2.4);
+      ctx.stroke();
+    }
+
+    for(let i = grit.length - 1; i >= 0; i--){
+      const q = grit[i];
+      q.vx *= 0.99;
+      q.vy = q.vy * 0.99 + q.g;
+      q.ph += q.f;
+      q.x += q.vx + Math.sin(q.ph) * 0.35;
+      q.y += q.vy;
+      if(q.y >= H - 3){ settled.push({ x: q.x, y: H - 1 - Math.random() * 5, s: q.s, a: q.a }); grit.splice(i, 1); continue; }
+      if(q.x > W + 10 || q.x < -10){ grit.splice(i, 1); continue; }
+      speck(q.x, q.y, q.s, q.a);
+    }
+
+    if(thawing) settled = settled.filter(s => (s.a -= 0.012) > 0);
+    if(settled.length > 1400) settled.splice(0, settled.length - 1400);
+    for(const s of settled) speck(s.x, s.y, s.s, s.a);
     ctx.globalAlpha = 1;
 
-    animId = requestAnimationFrame(animate);
+    if(spraying || puffs.length || grit.length || streaks.length || settled.length){
+      animId = requestAnimationFrame(frame);
+    } else {
+      animId = null;
+      ctx.clearRect(0, 0, W, H);
+    }
+  }
+
+  // frost, drawn once per screen size: a haze, fine grain, and branching crystals at 60 degrees in each corner
+  function frond(g, x, y, ang, len, depth){
+    const x2 = x + Math.cos(ang) * len, y2 = y + Math.sin(ang) * len;
+    g.lineWidth = depth * 0.22 + 0.3;
+    g.strokeStyle = 'rgba(110,130,150,0.1)';   // etched shadow, so it shows on the light page
+    g.beginPath(); g.moveTo(x + 0.8, y + 0.8); g.lineTo(x2 + 0.8, y2 + 0.8); g.stroke();
+    g.strokeStyle = `rgba(255,255,255,${0.22 + depth * 0.1})`;
+    g.beginPath(); g.moveTo(x, y); g.lineTo(x2, y2); g.stroke();
+    if(depth <= 0) return;
+    const n = 1 + Math.floor(Math.random() * 2);
+    for(let i = 1; i <= n; i++){
+      const t = i / (n + 1), bx = x + (x2 - x) * t, by = y + (y2 - y) * t, bl = len * (0.5 - t * 0.2);
+      frond(g, bx, by, ang + Math.PI / 3, bl, depth - 1);
+      frond(g, bx, by, ang - Math.PI / 3, bl, depth - 1);
+    }
+  }
+  function drawFrost(){
+    const key = W + 'x' + H;
+    if(frostSize === key) return;
+    frostSize = key;
+    const g = frostCanvas.getContext('2d');
+    frostCanvas.width = W * DPR; frostCanvas.height = H * DPR;
+    g.setTransform(DPR, 0, 0, DPR, 0, 0);
+    g.lineCap = 'round';
+    const R = Math.min(W, H) * 0.36;
+    [[0, 0], [W, 0], [0, H], [W, H]].forEach(([cx, cy]) => {
+      const inward = Math.atan2(H / 2 - cy, W / 2 - cx);
+      const haze = g.createRadialGradient(cx, cy, 0, cx, cy, R);
+      haze.addColorStop(0, 'rgba(236,244,250,0.32)');
+      haze.addColorStop(1, 'rgba(236,244,250,0)');
+      g.fillStyle = haze;
+      g.fillRect(cx - R, cy - R, R * 2, R * 2);
+      for(let i = 0; i < 2600; i++){
+        const d = R * Math.pow(Math.random(), 1.8), a = inward + (Math.random() - 0.5) * Math.PI / 2;
+        g.fillStyle = `rgba(255,255,255,${((0.25 + Math.random() * 0.5) * (1 - d / R)).toFixed(3)})`;
+        g.fillRect(cx + Math.cos(a) * d, cy + Math.sin(a) * d, 1, 1);
+      }
+      // feathery: lots of short fronds packed into the corner, thinning out towards the middle
+      for(let i = 0; i < 70; i++){
+        const d = R * 0.55 * Math.pow(Math.random(), 1.6), a = inward + (Math.random() - 0.5) * Math.PI / 2;
+        frond(g, cx + Math.cos(a) * d, cy + Math.sin(a) * d, inward + (Math.random() - 0.5) * 2, 7 + Math.random() * 20 * (1 - d / R), 2);
+      }
+    });
   }
 
   function startSnow(){
     if(snowActive) return;
-    snowActive = true;
-    if(fadeTimer){ clearTimeout(fadeTimer); fadeTimer = null; }
+    snowActive = true; thawing = false;
+    clearTimeout(fadeTimer); clearTimeout(frostTimer); clearTimeout(sprayTimer);
+    drawFrost();
     maker.classList.add('active');
-    // Start spawning after maker slides in
-    setTimeout(()=>{
-      if(!snowActive) return;
-      if(!animId) animate();
-      snowInterval = setInterval(()=>{
-        if(snowActive) spawnParticles();
-      }, 40);
-    }, 400);
+    // spray once the sticker has landed
+    sprayTimer = setTimeout(() => { spraying = true; if(!animId) frame(); }, 420);
+    // after a while running, the corners start to freeze
+    frostTimer = setTimeout(() => frost.classList.add('on'), 2200);
   }
 
-  let snowInterval;
   function stopSnow(){
-    snowActive = false;
+    snowActive = false; spraying = false;
+    clearTimeout(sprayTimer); clearTimeout(frostTimer);
     maker.classList.remove('active');
-    if(snowInterval){ clearInterval(snowInterval); snowInterval = null; }
-    // Let existing particles settle, then fade
-    fadeTimer = setTimeout(()=>{
-      // Fade out settled snow
-      const fadeOut = setInterval(()=>{
-        for(let s of settled) s.opacity -= 0.02;
-        settled = settled.filter(s => s.opacity > 0);
-        if(settled.length === 0 && particles.length === 0){
-          clearInterval(fadeOut);
-          if(animId){ cancelAnimationFrame(animId); animId = null; }
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-      }, 50);
-    }, 2000);
+    frost.classList.remove('on');
+    // let the last of it land, then melt what settled
+    fadeTimer = setTimeout(() => { thawing = true; if(!animId) frame(); }, 2200);
   }
 
   heroTitle.addEventListener('mouseenter', startSnow);
