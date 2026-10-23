@@ -7,7 +7,7 @@
   "compatibility_date": "2026-09-28",
   "d1_databases": [
     {
-      // signups from hesh.ca/signup (functions/api/signup.js); schema in migrations/
+      // signups from hesh.ca/signup, the site's own tracking and outreach links, all read by /admin; schema in migrations/
       "binding": "DB",
       "database_name": "hesh-signups",
       "database_id": "ff5d1bd7-22f6-4e64-84d6-17fc5a8b2c20",
@@ -21,5 +21,6 @@
   }
   // secrets, set with `wrangler pages secret put <NAME> --project-name hesh`:
   //   TURNSTILE_SECRET  the "hesh.ca signup" widget's secret key
-  //   IP_SALT           random; hashes visitor IPs for the signup rate limit
+  //   IP_SALT           random; hashes visitor IPs (rate limits, tracking) and signs admin sessions
+  //   ADMIN_PASSWORD    the /admin password, 12+ characters
 }

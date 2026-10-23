@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>backyard rail - admin</title>
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+<link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+<div class="login">
+  <form id="f" autocomplete="on">
+    <p class="mark">backyard<b>rail</b></p>
+    <p class="caps muted">admin</p>
+    <input type="text" name="username" autocomplete="username" value="admin" hidden>
+    <label class="field">password
+      <input type="password" id="pw" name="password" autocomplete="current-password" required maxlength="256" autofocus>
+    </label>
+    <div id="ts" class="ts"></div>
+    <button class="btn" id="go" type="submit">sign in</button>
+    <p class="err" id="err" role="alert" hidden></p>
+  </form>
+</div>
+<script src="/admin/login.js"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstile" async defer></script>
+</body>
+</html>

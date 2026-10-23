@@ -325,8 +325,12 @@ function withToken(cb) {
   setTimeout(function() { if (waiting === take) { waiting = null; cb(''); } }, 20000);
 }
 
+// the site tracker (t.js), when it loaded
+function tk(type, label) { if (window.heshTrack) window.heshTrack(type, label); }
+
 function trackIG() {
   clickedIG = true;
+  tk('instagram', signupId ? 'after signing up' : 'before signing up');
   // after signing up, mark that signup; before, it rides along with the form
   if (signupId && navigator.sendBeacon) {
     navigator.sendBeacon('/api/instagram', new Blob([JSON.stringify({ id: signupId })], { type: 'application/json' }));
@@ -341,6 +345,7 @@ function showDone() {
 }
 
 function failed(msg) {
+  tk('form', 'refused: ' + msg);
   var err = document.getElementById('formErr');
   err.textContent = msg;
   err.hidden = false;
@@ -370,19 +375,17 @@ function go(e) {
   btn.disabled = true;
   btn.textContent = 'one sec...';
 
-  var vid = '';
-  try { vid = localStorage.getItem('hesh_vid') || ''; } catch (x) {}
-
+  tk('form', 'submit');
   withToken(function(t) {
     if (!t) return failed('couldn\'t check you\'re a person, try again');
     fetch('/api/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: n, email: em, phone: p, source: SOURCE, instagram: clickedIG, visitorId: vid, token: t })
+      body: JSON.stringify({ name: n, email: em, phone: p, source: SOURCE, instagram: clickedIG, token: t })
     })
       .then(function(r) { return r.json().catch(function() { return {}; }).then(function(d) { return { ok: r.ok, d: d }; }); })
       .then(function(res) {
-        if (res.ok && res.d.id) { signupId = res.d.id; showDone(); }
+        if (res.ok && res.d.id) { signupId = res.d.id; tk('signup', SOURCE); showDone(); }
         else failed(res.d.error || 'that didn\'t go through, try again');
       })
       .catch(function() { failed('no connection, try again'); });
@@ -391,6 +394,7 @@ function go(e) {
   return false;
 }
 </script>
+<script src="/t.js" defer></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstile" async defer></script>
 
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"e86e2259f3ff45b9bf551050fc6f536a","r":1,"spa":2}' crossorigin="anonymous"></script>

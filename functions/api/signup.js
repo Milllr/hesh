@@ -8,6 +8,10 @@
 // every refusal is { error, code } so the page can say what went wrong.
 // same origin only: the page calls this with a relative url, so no cors headers.
 
+import { json, hashIp } from '../../lib/http.js';
+import { verifyTurnstile } from '../../lib/turnstile.js';
+import { visitorId } from '../../lib/visitor.js';
+
 const MAX_BODY = 4096;
 const ACTION = 'signup';
 const RATE_LIMIT = 30;
@@ -15,14 +19,6 @@ const RATE_WINDOW_MS = 10 * 60 * 1000;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE = /^[0-9 +().-]{7,25}$/;
 const SOURCE = /^[a-z0-9_-]{1,40}$/i;
-const VISITOR = /^[\w-]{1,64}$/;
-
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
-  });
-}
 
 function fail(code, error, status) {
   return json({ error, code }, status);
@@ -30,32 +26,6 @@ function fail(code, error, status) {
 
 function field(v) {
   return typeof v === 'string' ? v.trim() : '';
-}
-
-async function verifyTurnstile(env, token, ip) {
-  let result;
-  try {
-    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      signal: AbortSignal.timeout(10000),
-      body: new URLSearchParams({ secret: env.TURNSTILE_SECRET, response: token, remoteip: ip }),
-    });
-    if (!res.ok) return false;
-    result = await res.json();
-  } catch {
-    return false;
-  }
-  if (!result.success) return false;
-  // local dev only (.dev.vars): turnstile's published test keys answer from example.com with no action
-  if (env.ALLOW_TEST_KEYS === '1' && result.metadata && result.metadata.result_with_testing_key === true) return true;
-  const hosts = (env.TURNSTILE_HOSTNAMES || '').split(',').map((h) => h.trim()).filter(Boolean);
-  return result.action === ACTION && hosts.includes(result.hostname);
-}
-
-async function hashIp(ip, salt) {
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(salt + '|' + ip));
-  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
 export async function onRequestPost({ request, env }) {
@@ -86,13 +56,14 @@ export async function onRequestPost({ request, env }) {
   if (phone && !PHONE.test(phone)) return fail('phone', 'that phone number doesn\'t look right', 400);
   const source = typeof body.source === 'string' && SOURCE.test(body.source) ? body.source : 'site';
   const instagram = body.instagram === true ? 1 : 0;
-  const visitorId = typeof body.visitorId === 'string' && VISITOR.test(body.visitorId) ? body.visitorId : null;
+  // the site's visitor cookie, so /admin can show what they looked at before signing up
+  const visitor = visitorId(request) || null;
   const token = typeof body.token === 'string' ? body.token : '';
   if (!token || token.length > 2048) return fail('turnstile', 'verification missing, try again', 400);
 
   // 3. turnstile
   const ip = request.headers.get('CF-Connecting-IP') || '';
-  if (!(await verifyTurnstile(env, token, ip))) return fail('turnstile', 'couldn\'t check you\'re a person, try again', 403);
+  if (!(await verifyTurnstile(env, token, ip, ACTION))) return fail('turnstile', 'couldn\'t check you\'re a person, try again', 403);
 
   // 4. per-network limit
   const ipHash = await hashIp(ip, env.IP_SALT);
@@ -115,7 +86,7 @@ export async function onRequestPost({ request, env }) {
          ip_hash = excluded.ip_hash,
          updated_at = excluded.updated_at
        RETURNING id`
-    ).bind(crypto.randomUUID(), name, email, phone || null, source, instagram, visitorId, ipHash, now.toISOString()).first();
+    ).bind(crypto.randomUUID(), name, email, phone || null, source, instagram, visitor, ipHash, now.toISOString()).first();
     return json({ ok: true, id: row.id });
   } catch (err) {
     console.error('[signup] d1 error:', err && err.message);
