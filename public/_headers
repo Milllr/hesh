@@ -1,0 +1,14 @@
+# Security headers for every page. Cloudflare Pages reads this file and does not serve it.
+#
+# The CSP lists everything the site actually loads:
+#   script.google.com / script.googleusercontent.com - the home page's analytics endpoint (Apps Script answers with a redirect)
+#   static.cloudflareinsights.com / cloudflareinsights.com - Cloudflare Web Analytics
+#   challenges.cloudflare.com - Turnstile on the signup form (its script and its iframe)
+# 'unsafe-inline' stays because the pages keep their CSS and JS inline; nothing renders visitor input into the page.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self'; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://cloudflareinsights.com; frame-src https://script.google.com https://script.googleusercontent.com https://challenges.cloudflare.com; form-action 'self' https://script.google.com https://script.googleusercontent.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+  Strict-Transport-Security: max-age=31536000

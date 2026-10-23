@@ -1,11 +1,25 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
+  // Cloudflare Pages project "hesh": builds from main with no build step, serves public/,
+  // and runs the functions in functions/ on the same domain. Their bindings live here.
   "name": "hesh",
+  "pages_build_output_dir": "./public",
   "compatibility_date": "2026-09-28",
-  "assets": {
-    "directory": "./public"
-  },
-  "observability": {
-    "enabled": true
+  "d1_databases": [
+    {
+      // signups from hesh.ca/signup (functions/api/signup.js); schema in migrations/
+      "binding": "DB",
+      "database_name": "hesh-signups",
+      "database_id": "ff5d1bd7-22f6-4e64-84d6-17fc5a8b2c20",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": {
+    // where a Turnstile token may come from. Preview deployments (*.hesh-b15.pages.dev) are
+    // left out on purpose, so a preview can't write into the real signup list.
+    "TURNSTILE_HOSTNAMES": "hesh.ca,hesh-b15.pages.dev"
   }
+  // secrets, set with `wrangler pages secret put <NAME> --project-name hesh`:
+  //   TURNSTILE_SECRET  the "hesh.ca signup" widget's secret key
+  //   IP_SALT           random; hashes visitor IPs for the signup rate limit
 }
