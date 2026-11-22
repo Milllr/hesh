@@ -302,8 +302,14 @@ var signupId = '';
 try { localStorage.removeItem('signups'); } catch (x) {}
 
 // TURNSTILE: rendered on load and hidden unless Cloudflare wants an interaction. Tokens are single use,
-// so each attempt takes the current one and a failed attempt resets the widget for a fresh one.
-var widgetId = null, token = '', waiting = null;
+// so each attempt takes the current one and a refused attempt resets the widget for a fresh one.
+// Cloudflare can take a while to decide, and on busy shared networks (Western's wifi) it often asks for a
+// tap on "verify you are human". So a submit waits for the token, says what's going on, and sends the
+// moment the token arrives. It used to give up after 20 seconds and reset the widget, which hid the box
+// people needed to tap and left them stuck on "couldn't check you're a person".
+var widgetId = null, token = '', waiting = null, needsTap = false;
+var TOKEN_WAIT_MS = 120000;
+var TAP = 'tap "verify you are human" above to finish signing up';
 window.onTurnstile = function() {
   widgetId = turnstile.render('#ts', {
     sitekey: SITEKEY,
@@ -312,17 +318,39 @@ window.onTurnstile = function() {
     theme: 'light',
     size: 'flexible',
     'refresh-expired': 'auto',
-    callback: function(t) { token = t; if (waiting) { var w = waiting; waiting = null; w(); } },
+    callback: function(t) {
+      token = t; needsTap = false;
+      if (waiting) { var w = waiting; waiting = null; say(''); w(); }
+    },
     'expired-callback': function() { token = ''; },
-    'error-callback': function() { token = ''; }
+    'before-interactive-callback': function() {
+      needsTap = true;
+      tk('form', 'turnstile asked for a tap');
+      if (waiting) say(TAP);
+    },
+    'after-interactive-callback': function() { needsTap = false; },
+    'error-callback': function(code) {
+      token = '';
+      tk('form', 'turnstile error ' + code);
+      if (waiting) say('still checking you\'re a person, hang on a sec');
+    }
   });
 };
+
+// a line under the button for what's happening; empty hides it
+function say(msg) {
+  var el = document.getElementById('formErr');
+  el.textContent = msg;
+  el.hidden = !msg;
+}
 
 function withToken(cb) {
   function take() { var t = token; token = ''; cb(t); }
   if (token) return take();
   waiting = take;
-  setTimeout(function() { if (waiting === take) { waiting = null; cb(''); } }, 20000);
+  document.getElementById('btn').textContent = 'checking you\'re a person...';
+  say(needsTap ? TAP : '');
+  setTimeout(function() { if (waiting === take) { waiting = null; cb(''); } }, TOKEN_WAIT_MS);
 }
 
 // the site tracker (t.js), when it loaded
@@ -344,14 +372,15 @@ function showDone() {
   document.getElementById('done').style.display = 'block';
 }
 
-function failed(msg) {
+// keepWidget: the widget never gave us a token, so leave it as it is (resetting would hide a tap box
+// someone is about to use). Otherwise the token was spent and the widget needs a fresh one.
+function failed(msg, keepWidget) {
   tk('form', 'refused: ' + msg);
-  var err = document.getElementById('formErr');
-  err.textContent = msg;
-  err.hidden = false;
+  say(msg);
   var btn = document.getElementById('btn');
   btn.disabled = false;
   btn.textContent = 'sign me up';
+  if (keepWidget) return;
   token = '';
   if (widgetId !== null) turnstile.reset(widgetId);
 }
@@ -376,8 +405,13 @@ function go(e) {
   btn.textContent = 'one sec...';
 
   tk('form', 'submit');
+  // the check never loaded (an ad blocker, or no connection to Cloudflare): say so now rather than wait
+  if (!window.turnstile || widgetId === null) return failed('the person check didn\'t load. turn off any ad blocker or try another browser');
   withToken(function(t) {
-    if (!t) return failed('couldn\'t check you\'re a person, try again');
+    if (!t) return needsTap
+      ? failed('tap "verify you are human" above, then hit sign me up again', true)
+      : failed('couldn\'t check you\'re a person, reload the page and try again');
+    btn.textContent = 'one sec...';
     fetch('/api/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
