@@ -159,6 +159,29 @@
 
   .ig:hover, .ig:active { background: var(--ink); color: var(--snow); }
 
+  /* the follow button and the way back to the site under it */
+  .btns { display: grid; gap: 16px; max-width: 420px; }
+
+  /* follow: filled in the ramp's orange, bigger and sat on a hard ink shadow so it reads as the thing to press */
+  .ig.follow {
+    display: flex; align-items: center; justify-content: center; gap: .55em;
+    padding: 1.3rem 1rem;
+    background: var(--ramp);
+    font-weight: 800;
+    font-size: 1.25rem;
+    letter-spacing: -.01em;
+    box-shadow: 5px 5px 0 var(--ink);
+    transition: transform .12s, box-shadow .12s;
+  }
+  .ig.follow .arr { flex: none; width: .68em; height: .68em; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: square; transition: transform .12s; }
+  .ig.follow:hover, .ig.follow:active { background: var(--ramp); color: var(--ink); }
+  @media (hover: hover) {
+    .ig.follow:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--ink); }
+    .ig.follow:hover .arr { transform: translate(2px, -2px); }
+  }
+  .ig.follow:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ink); }
+  @media (prefers-reduced-motion: reduce) { .ig.follow, .ig.follow .arr { transition: none; } }
+
   .ig-label {
     font: 9px/1.6 var(--caps);
     letter-spacing: 0.14em;
@@ -169,6 +192,11 @@
 
   .done { display: none; position: relative; }
   .done > * { max-width: 420px; }
+
+  /* phones: the buttons (and the done screen with them) run the full width, like sign me up */
+  @media (max-width: 760px) {
+    .btns, .btns .ig, .done > *, .sep { max-width: none; }
+  }
 
   .done h2 {
     font-family: var(--sans);
@@ -247,7 +275,10 @@
       <li>updates</li>
     </ul>
     <p class="ig-label">follow us</p>
-    <a href="https://instagram.com/backyardrail" target="_blank" rel="noopener" class="ig" id="igBtn" onclick="trackIG()">@backyardrail</a>
+    <div class="btns">
+      <a href="https://instagram.com/backyardrail" target="_blank" rel="noopener" class="ig follow" id="igBtn" onclick="trackIG()">@backyardrail<svg class="arr" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 10 10 2M4 2h6v6"/></svg></a>
+      <a href="/" class="ig">check out past jams</a>
+    </div>
   </div>
 </div>
 
@@ -256,7 +287,10 @@
   <p>we'll hit you up for the next jam.</p>
   <div class="sep"></div>
   <p class="ig-label">follow us</p>
-  <a href="https://instagram.com/backyardrail" target="_blank" rel="noopener" class="ig" id="igBtn2" onclick="trackIG()">follow @backyardrail</a>
+  <div class="btns">
+    <a href="https://instagram.com/backyardrail" target="_blank" rel="noopener" class="ig follow" id="igBtn2" onclick="trackIG()">follow @backyardrail<svg class="arr" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 10 10 2M4 2h6v6"/></svg></a>
+    <a href="/" class="ig">check out past jams</a>
+  </div>
   <p class="done .ig-followed" id="igNote" style="display:none;font-size:0.5rem;color:#545c66;margin-top:0.5rem;opacity:0.5;">clicked</p>
 </div>
 </main>
